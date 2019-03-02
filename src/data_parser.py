@@ -57,14 +57,15 @@ def convert_estate(estate: Tag) -> Estate:
     )
 
 
-if len(sys.argv) < 2:
-    print("Usage {0} <url> [csv_prefix]".format(sys.argv[0]))
+if len(sys.argv) < 3:
+    print("Usage {0} <url> <output dir> [csv_prefix]".format(sys.argv[0]))
     sys.exit(1)
 
-csv_prefix = sys.argv[2] if len(sys.argv) > 2 else "output"
-
+output_dir = Path(sys.argv[2])  
+csv_prefix = sys.argv[3] if len(sys.argv) > 3 else "output"
+out_file_name = "{0}_{1}.csv".format(csv_prefix, datetime.now().strftime("%Y%m%d_%H%M"))
 try:
-    with Path("{0}_{1}.csv".format(sys.argv[2], datetime.now().strftime("%Y%m%d_%H%M"))).open("w+") as csv_file:
+    with (output_dir / out_file_name).open("w+") as csv_file:
         writer = csv.writer(csv_file, delimiter=',')
         estates_url = sys.argv[1]
         for estate_chunk in paginate_query(estates_url):
