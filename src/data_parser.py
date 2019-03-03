@@ -1,6 +1,7 @@
 import csv
 import re
 import sys
+from urllib.parse import urljoin
 from datetime import datetime
 from pathlib import Path
 from typing import Tuple, Optional, List
@@ -39,10 +40,10 @@ def paginate_query(url: str) -> List[Estate]:
     while url:
         print("Parsing {0} ...".format(url))
         estates, url = parse_page(url)
-        yield map(convert_estate, estates)
+        yield map(lambda e: convert_estate(e, url), estates)
 
 
-def convert_estate(estate: Tag) -> Estate:
+def convert_estate(estate: Tag, page_url: str) -> Estate:
     address = estate.select_one('div.listing__address').text.split(',')
     rooms = list(map(int, re.findall("\d+", estate.select_one('div.listing__data--room-count').text)))
     price_div = estate.select_one('div.price')
@@ -53,7 +54,7 @@ def convert_estate(estate: Tag) -> Estate:
         area=int(estate.select_one('div.listing__data--area-size').text.split()[0]),
         rooms=rooms[0],
         half_rooms=rooms[1] if len(rooms) > 1 else 0,
-        url=estate.select_one('a.listing__link').attrs['href']
+        url=urljoin(page_url, estate.select_one('a.listing__link').attrs['href'])
     )
 
 
