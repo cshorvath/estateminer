@@ -1,4 +1,4 @@
-FROM python:latest
+FROM python:3.6-alpine
 
 WORKDIR /opt/estateminer 
 COPY src /opt/estateminer
